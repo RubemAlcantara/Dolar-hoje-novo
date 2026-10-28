@@ -1,0 +1,42 @@
+
+name: Gerar APK - Cambio Pro
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'CambioPro/**'
+      - '.github/workflows/build-apk.yml'
+    branches:
+      - main2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: CambioPro
+
+    steps:
+      - name: Baixar codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Dar permissao ao Gradle
+        run: chmod +x gradlew
+
+      - name: Compilar APK
+        run: ./gradlew assembleDebug
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CambioPro-APK
+          path: CambioPro/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
